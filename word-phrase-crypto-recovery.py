@@ -33,7 +33,7 @@ unknown_word_positions = []
 supersonic_magic_list = [] 
 
 ''' Task 5: User provides wallet name to extract the wallet settings entered below''' 
-deriv_code = "m/0'/0" # user input
+deriv_code = "m/44'/0'/0'/0" # user input
 child_addresses_are_hardened = False # user input
 
 ''' Task 6: User defines search range depending on the wallet used, and Bitcoin addresses

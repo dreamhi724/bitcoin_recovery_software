@@ -15,7 +15,7 @@ _2048wordlist = file.read().split('\n') # .split returns a list of words
 file.close()
 
 ''' Task 2: User provides known and unknown word positions'''
-incomplete_phrase_words = "x y work aisle faculty exist ketchup clerk z p mistake become"
+incomplete_phrase_words = "x y work aisle faculty exist ketchup clerk z p mistake q"
 #incomplete_phrase_words = "adult mule x aisle y exist ketchup clerk great coin z become"
 incomplete_phrase_words = incomplete_phrase_words.split() # .split returns a list
 
@@ -431,18 +431,30 @@ for child_index_int in range(child_index_start, child_index_end):
                                 for number_p in range(2048):
                                     incomplete_phrase_binary_list[unknown_word_positions[3]] = (
                                     format(number_p, 'b').zfill(11))
-                                    matched_address, complete_phrase_words = abc(incomplete_phrase_binary_list, 
-                                    child_index_int) 
+                                    if len(unknown_word_positions) > 3: # if there is a 3rd missing word then
+                                        for number_q in range(2048):
+                                            incomplete_phrase_binary_list[unknown_word_positions[4]] = (
+                                            format(number_q, 'b').zfill(11))
+                                            matched_address, complete_phrase_words = abc(incomplete_phrase_binary_list, 
+                                            child_index_int) 
+                                            if matched_address != None:
+                                                break                    
+                                    else:
+                                        matched_address, complete_phrase_words = abc(incomplete_phrase_binary_list, child_index_int)
                                     if matched_address != None:
-                                        break                    
+                                        break
+                                    # matched_address, complete_phrase_words = abc(incomplete_phrase_binary_list, 
+                                    # child_index_int) 
+                                    # if matched_address != None:
+                                    #     break                    
                             else:
                                 matched_address, complete_phrase_words = abc(incomplete_phrase_binary_list, child_index_int)
                             if matched_address != None:
                                 break  
-                            matched_address, complete_phrase_words = abc(incomplete_phrase_binary_list, 
-                            child_index_int) 
-                            if matched_address != None:
-                                break                    
+                            # matched_address, complete_phrase_words = abc(incomplete_phrase_binary_list, 
+                            # child_index_int) 
+                            # if matched_address != None:
+                            #     break                    
                     else:
                         matched_address, complete_phrase_words = abc(incomplete_phrase_binary_list, child_index_int)
                     if matched_address != None:

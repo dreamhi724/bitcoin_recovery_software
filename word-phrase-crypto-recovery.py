@@ -15,8 +15,7 @@ _2048wordlist = file.read().split('\n') # .split returns a list of words
 file.close()
 
 ''' Task 2: User provides known and unknown word positions'''
-incomplete_phrase_words = "x y work aisle faculty exist ketchup clerk great coin \
-mistake become"
+incomplete_phrase_words = "x y work aisle faculty exist ketchup clerk z p mistake become"
 #incomplete_phrase_words = "adult mule x aisle y exist ketchup clerk great coin z become"
 incomplete_phrase_words = incomplete_phrase_words.split() # .split returns a list
 
@@ -33,7 +32,7 @@ unknown_word_positions = []
 supersonic_magic_list = [] 
 
 ''' Task 5: User provides wallet name to extract the wallet settings entered below''' 
-deriv_code = "m/44'/0'/0'/0" # user input
+deriv_code = "m/0'/0" # user input
 child_addresses_are_hardened = False # user input
 
 ''' Task 6: User defines search range depending on the wallet used, and Bitcoin addresses
@@ -84,11 +83,11 @@ def words_to_binary():
     # list to store each of the known phrase words into binary format
     incomplete_phrase_binary = [] 
     for word in incomplete_phrase_words: 
-        if (word is not 'x') and (word is not 'y') and (word is not 'z'): 
+        if (word != 'x') and (word != 'y') and (word != 'z') and (word != 'p') and (word != 'q'): 
             word_nr = _2048wordlist.index(word) # variable = 2048 word list index number
             # converts word_nr to binary and fills up till 11 bits
             incomplete_phrase_binary.append(format(word_nr, 'b').zfill(11)) 
-        elif word is 'x' or 'y' or 'z':
+        elif word == 'x' or 'y' or 'z' or 'p' or 'q':
             # to track unkown words index numbers
             unknown_word_positions.append(incomplete_phrase_words.index(word)) 
             # if word is 'x' replace it with 'x' at end of list
@@ -280,6 +279,7 @@ def convert_int_to_b58(public_key_int):
 # If match, 12 phrase word recovery was successful.
 def address_search(base58_string):    
     address_match = False
+    # print(base58_string)
     if base58_string in user_bitcoin_addresses:
         address_match = True
     else:
@@ -326,9 +326,9 @@ def generate_elliptic_curve(private_key_hex):
             low, high = (g_spot[0] - q[0]) % p_curve, p_curve
     
             while low > 1:
-               ratio = high//low
-               nm, new = hm - lm * ratio, high - low * ratio
-               lm, low, hm, high = nm, new, lm, low
+                ratio = high//low
+                nm, new = hm - lm * ratio, high - low * ratio
+                lm, low, hm, high = nm, new, lm, low
     
             lam_add = ((g_spot[1] - q[1]) * (lm % p_curve)) % p_curve
             x_axe = (lam_add * lam_add - q[0] - g_spot[0]) % p_curve
@@ -388,6 +388,7 @@ def abc(complete_phrase_binary_list, child_index_int):
         lowest_parent_private_key_hex, lowest_parent_chain_code_hex, complete_phrase_words = generate_lowest_parent_private_key(complete_phrase_binary_string, checksum_length, deriv_code)
         
         supersonic_magic_list.append([complete_phrase_words, lowest_parent_private_key_hex, lowest_parent_chain_code_hex])
+        print(complete_phrase_words)
         matched_address = test_new_address(lowest_parent_private_key_hex, lowest_parent_chain_code_hex, child_index_int)    
         return matched_address, complete_phrase_words
     else:
@@ -426,6 +427,18 @@ for child_index_int in range(child_index_start, child_index_end):
                         for number_z in range(2048):
                             incomplete_phrase_binary_list[unknown_word_positions[2]] = (
                             format(number_z, 'b').zfill(11))
+                            if len(unknown_word_positions) > 3: # if there is a 3rd missing word then
+                                for number_p in range(2048):
+                                    incomplete_phrase_binary_list[unknown_word_positions[3]] = (
+                                    format(number_p, 'b').zfill(11))
+                                    matched_address, complete_phrase_words = abc(incomplete_phrase_binary_list, 
+                                    child_index_int) 
+                                    if matched_address != None:
+                                        break                    
+                            else:
+                                matched_address, complete_phrase_words = abc(incomplete_phrase_binary_list, child_index_int)
+                            if matched_address != None:
+                                break  
                             matched_address, complete_phrase_words = abc(incomplete_phrase_binary_list, 
                             child_index_int) 
                             if matched_address != None:
@@ -446,7 +459,7 @@ for child_index_int in range(child_index_start, child_index_end):
     else:
         for list_item in supersonic_magic_list:
             matched_address = test_new_address(list_item[1], list_item[2], child_index_int)
-        
+            print("no1 "+ matched_address)
             if matched_address != None:      
                 complete_phrase_words = list_item[0]
                 print('matched_address', matched_address)
@@ -458,12 +471,9 @@ print('object size:', sys.getsizeof(supersonic_magic_list))
 print(len(supersonic_magic_list))
 ''' Task 22: Report user after program completed. ''' 
 if matched_address != None:
-    print(f'''Your 12 word phrase recovery has been succesful.
-    We’ve matched your public key: {matched_address}
+    print(f'Your 12 word phrase recovery has been successful. We’ve matched your public key: {matched_address}')
     print(f'Your correct 12 word prase is: {complete_phrase_words}')
 else:
     print(f'Recovery not succesful. If you wish, you can contact our support.')
     print(f'You have searched child index: {child_index_start} till: {child_index_end}')
-
-# need help? You can contact us at: www.rseindustries.com
 
